@@ -1,0 +1,61 @@
+version: "3.4"
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+
+  nginx-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - nginx-proxy
+
+  www:
+    build: ./www
+    environment:
+      - VIRTUAL_HOST=<YOUR_HOSTNAME>
+      - LETSENCRYPT_HOST=<YOUR_HOSTNAME>
+      - LETSENCRYPT_EMAIL=<YOUR_EMAIL>
+    depends_on:
+      - nginx-proxy
+      - nginx-letsencrypt
+
+  node-api:
+    build: ./node-api
+    environment:
+      - VIRTUAL_HOST=<YOUR_API_HOSTNAME>
+      - LETSENCRYPT_HOST=<YOUR_API_HOSTNAME>
+      - LETSENCRYPT_EMAIL=<YOUR_EMAIL>
+    depends_on:
+      - nginx-proxy
+      - nginx-letsencrypt
+      - mongodb
+
+  mongodb:
+    image: mongo
+    volumes:
+      - mongodbdata:/data/db
+
+volumes:
+  mongodbdata:
+    external:
+      name: mongodbdata
+  certs:
+    external:
+      name: nginxcerts
+  vhostd:
+  html:
