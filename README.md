@@ -20,4 +20,4 @@ Make sure your server allow port 80 for http and 443 for https
 Yes, please.
 
 # License
-[MIT License]:(https://opensource.org/licenses/mit-license.php)
+[MIT License](https://opensource.org/licenses/mit-license.php)
