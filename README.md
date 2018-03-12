@@ -11,8 +11,10 @@ Make sure your server allow port 80 for http and 443 for https
 # Usage
 1. Put your node api code in ./node-api/code
 2. Put your www code in ./www/public
-3. Run docker-compose build
-4. Run docker-compose up -d
+3. Run docker volume create nginxcerts mongodbdata
+4. Run docker-compose build
+5. Run docker-compose up -d
+6. Run docker-compose down -v
 
 # Contribution
 Yes, please.
